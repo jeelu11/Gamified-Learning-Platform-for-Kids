@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { User, LoginCredentials, RegisterData, AuthContextType } from '@/types/auth';
 import { authService } from '@/services/authService';
+import { firebaseAuthService } from '@/services/firebaseAuthService';
 import toast from 'react-hot-toast';
 
 interface AuthState {
