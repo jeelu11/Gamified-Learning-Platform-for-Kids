@@ -147,14 +147,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async (): Promise<void> => {
     try {
-      // Call logout API if available
+      // Firebase logout
+      await firebaseAuthService.signOut();
+
+      // Backend logout if JWT tokens exist
       const token = localStorage.getItem('accessToken');
       if (token) {
         await authService.logout();
       }
     } catch (error) {
-      // Continue with logout even if API call fails
-      console.error('Logout API error:', error);
+      console.error('Logout error:', error);
     } finally {
       // Clear local storage
       localStorage.removeItem('accessToken');
