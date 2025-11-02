@@ -75,36 +75,43 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Check if user is already authenticated on app start
+  // Check if user is already authenticated on app start (Firebase + JWT fallback)
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('accessToken');
-      const refreshToken = localStorage.getItem('refreshToken');
+      // First check Firebase auth state
+      const unsubscribe = firebaseAuthService.onAuthStateChanged(async (firebaseUser) => {
+        if (firebaseUser) {
+          dispatch({ type: 'AUTH_SUCCESS', payload: { user: firebaseUser } });
+        } else {
+          // Fallback to JWT tokens
+          const token = localStorage.getItem('accessToken');
+          const refreshToken = localStorage.getItem('refreshToken');
 
-      if (token && refreshToken) {
-        try {
-          // Validate token by fetching current user
-          const user = await authService.getCurrentUser();
-          dispatch({ type: 'AUTH_SUCCESS', payload: { user } });
-        } catch (error) {
-          // Token is invalid, try to refresh
-          try {
-            const newTokens = await authService.refreshToken(refreshToken);
-            localStorage.setItem('accessToken', newTokens.accessToken);
-            localStorage.setItem('refreshToken', newTokens.refreshToken);
+          if (token && refreshToken) {
+            try {
+              const user = await authService.getCurrentUser();
+              dispatch({ type: 'AUTH_SUCCESS', payload: { user } });
+            } catch (error) {
+              try {
+                const newTokens = await authService.refreshToken(refreshToken);
+                localStorage.setItem('accessToken', newTokens.accessToken);
+                localStorage.setItem('refreshToken', newTokens.refreshToken);
 
-            const user = await authService.getCurrentUser();
-            dispatch({ type: 'AUTH_SUCCESS', payload: { user } });
-          } catch (refreshError) {
-            // Refresh token is also invalid, clear storage
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+                const user = await authService.getCurrentUser();
+                dispatch({ type: 'AUTH_SUCCESS', payload: { user } });
+              } catch (refreshError) {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                dispatch({ type: 'AUTH_FAILURE' });
+              }
+            }
+          } else {
             dispatch({ type: 'AUTH_FAILURE' });
           }
         }
-      } else {
-        dispatch({ type: 'AUTH_FAILURE' });
-      }
+      });
+
+      return () => unsubscribe();
     };
 
     initAuth();
