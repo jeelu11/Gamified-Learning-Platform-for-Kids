@@ -121,15 +121,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       dispatch({ type: 'AUTH_START' });
 
-      const response = await authService.login(credentials);
+      // Try Firebase auth first, fallback to JWT
+      let user: User;
+      try {
+        user = await firebaseAuthService.signInWithEmail(credentials.email, credentials.password);
+      } catch (firebaseError) {
+        const response = await authService.login(credentials);
+        user = response.user;
 
-      // Store tokens
-      localStorage.setItem('accessToken', response.tokens.accessToken);
-      localStorage.setItem('refreshToken', response.tokens.refreshToken);
+        // Store JWT tokens as fallback
+        localStorage.setItem('accessToken', response.tokens.accessToken);
+        localStorage.setItem('refreshToken', response.tokens.refreshToken);
+      }
 
-      dispatch({ type: 'AUTH_SUCCESS', payload: { user: response.user } });
-
-      toast.success(`Welcome back, ${response.user.profile.firstName}! 🎉`);
+      dispatch({ type: 'AUTH_SUCCESS', payload: { user } });
+      toast.success(`Welcome back, ${user.profile.firstName}! 🎉`);
 
     } catch (error: any) {
       dispatch({ type: 'AUTH_FAILURE' });
