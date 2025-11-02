@@ -10,8 +10,17 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const { login, signInWithGoogle, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      navigate('/dashboard');
+    } catch (error) {
+      // Error is handled by the auth context
+    }
+  };
 
   const {
     register,
