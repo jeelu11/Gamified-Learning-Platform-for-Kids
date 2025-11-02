@@ -168,6 +168,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
               </span>
             )}
           </button>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500 font-kid-body">OR</span>
+            </div>
+          </div>
+
+          {/* Google Sign-In Button */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
+            className={`w-full py-4 px-6 rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 active:scale-95 font-kid-header flex items-center justify-center space-x-3 ${
+              isLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+            }`}
+          >
+            <span className="text-2xl">🌐</span>
+            <span>Sign in with Google</span>
+          </button>
         </form>
 
         {/* Footer */}
