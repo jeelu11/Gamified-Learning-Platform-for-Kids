@@ -221,6 +221,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async (): Promise<void> => {
+    try {
+      dispatch({ type: 'AUTH_START' });
+
+      const user = await firebaseAuthService.signInWithGoogle();
+      dispatch({ type: 'AUTH_SUCCESS', payload: { user } });
+
+      toast.success(`Welcome, ${user.profile.firstName}! 🎉`);
+
+    } catch (error: any) {
+      dispatch({ type: 'AUTH_FAILURE' });
+      const errorMessage = error.message || 'Google sign-in failed';
+      toast.error(errorMessage);
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user: state.user,
     isAuthenticated: state.isAuthenticated,
