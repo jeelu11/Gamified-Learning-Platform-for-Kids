@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Fredoka+One&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F8F9FA;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Kid-Friendly Component Styles */
+.btn-primary {
+  @apply bg-primary-blue text-white px-6 py-3 rounded-full
+         font-bold text-lg shadow-lg transform hover:scale-105
+         hover:bg-blue-600 transition-all duration-200
+         active:scale-95 focus:outline-none focus:ring-4
+         focus:ring-blue-300;
+}
+
+.btn-game {
+  @apply bg-gradient-to-r from-primary-orange to-primary-yellow
+         text-white px-8 py-4 rounded-2xl font-bold text-xl
+         shadow-xl transform hover:scale-110 hover:rotate-1
+         transition-all duration-300 active:scale-95
+         animate-pulse hover:animate-none;
+}
+
+.btn-success {
+  @apply bg-primary-green text-white px-6 py-3 rounded-full
+         font-bold shadow-lg transform hover:scale-105
+         hover:bg-green-600 transition-all duration-200
+         active:scale-95;
+}
+
+.game-card {
+  @apply bg-white rounded-2xl shadow-xl overflow-hidden
+         transform hover:scale-105 hover:rotate-1
+         transition-all duration-300 border-4 border-transparent
+         hover:border-primary-yellow;
+}
+
+.game-card-header {
+  @apply bg-gradient-to-br from-primary-blue to-primary-purple
+         p-6 text-white;
+}
+
+.game-card-content {
+  @apply p-6 bg-white;
+}
+
+.badge-achievement {
+  @apply inline-flex items-center justify-center w-16 h-16
+         rounded-full bg-gradient-to-br from-primary-yellow
+         to-primary-orange shadow-lg transform hover:scale-110
+         transition-all duration-200 animate-bounce
+         hover:animate-none;
+}
+
+.progress-bar {
+  @apply w-full bg-gray-200 rounded-full h-8 overflow-hidden
+         shadow-inner;
+}
+
+.progress-fill {
+  @apply bg-gradient-to-r from-primary-green to-primary-blue
+         h-full rounded-full transition-all duration-500
+         ease-out flex items-center justify-end pr-2;
+}
+
+.score-display {
+  @apply bg-gradient-to-r from-primary-yellow to-primary-orange
+         text-white px-6 py-3 rounded-full font-bold text-2xl
+         shadow-lg flex items-center space-x-2;
+}
+
+/* Touch-Optimized Styles */
+.touch-target {
+  @apply min-h-[44px] min-w-[44px];
+}
+
+.game-button-large {
+  @apply min-h-[56px] min-w-[56px];
+}
+
+/* Loading States */
+.loading-spinner {
+  @apply animate-spin rounded-full h-12 w-12
+         border-b-2 border-primary-blue;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-card {
+    @apply rounded-xl;
+  }
+
+  .btn-game {
+    @apply px-6 py-3 text-lg;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .transform {
+    animation: none !important;
+    transform: none !important;
+  }
+}
