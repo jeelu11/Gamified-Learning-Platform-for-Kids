@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:5.0
+    container_name: eduplay-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: eduplay123
+      MONGO_INITDB_DATABASE: eduplay
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./backend/scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - eduplay-network
+
+  # Node.js Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eduplay-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://admin:eduplay123@mongodb:27017/eduplay?authSource=admin
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production-256-bits
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production-256-bits
+      JWT_EXPIRE: 15m
+      JWT_REFRESH_EXPIRE: 7d
+      FRONTEND_URL: http://localhost:3000
+      FIREBASE_PROJECT_ID: eduplay-demo
+      FIREBASE_PRIVATE_KEY: |
+        -----BEGIN PRIVATE KEY-----
+        MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5v7Q8QJQZ9XJ2V
+        K9Wq8LzJqPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzK
+        jPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyL
+        zKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyLzKjPq3r8XyL
+        -----END PRIVATE KEY-----
+      FIREBASE_CLIENT_EMAIL: firebase-adminsdk-xxx@eduplay-demo.iam.gserviceaccount.com
+      EMAIL_SERVICE: gmail
+      EMAIL_USER: noreply@eduplay.com
+      EMAIL_PASS: your-app-password
+      STRIPE_SECRET_KEY: sk_test_your-stripe-secret-key
+      STRIPE_WEBHOOK_SECRET: whsec_your-webhook-secret
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - eduplay-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: eduplay-frontend
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: http://localhost:3001
+      REACT_APP_FIREBASE_API_KEY: your-firebase-api-key
+      REACT_APP_FIREBASE_AUTH_DOMAIN: eduplay-demo.firebaseapp.com
+      REACT_APP_FIREBASE_PROJECT_ID: eduplay-demo
+      REACT_APP_FIREBASE_STORAGE_BUCKET: eduplay-demo.appspot.com
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - eduplay-network
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: eduplay-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - eduplay-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  eduplay-network:
+    driver: bridge
