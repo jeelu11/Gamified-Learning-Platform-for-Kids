@@ -80,4 +80,5 @@ export interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>;
   refreshToken: () => Promise<void>;
   updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 }
